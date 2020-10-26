@@ -1,4 +1,4 @@
-#![festure(proc_macro_hygiene, decl_macro)]
+#![feature(proc_macro_hygiene, decl_macro)]
 #[macro_use] extern crate rocket;
 extern crate reqwest;
 extern crate rustc_serialize;
@@ -26,7 +26,7 @@ fn hello() -> String {
            match response.text() {
                Ok(text) => match file.write_all(text.as_bytes()) {
                    Ok(_) => println!("Data write in File"),
-                   Err(e) => println!("The error is this! {}",e)
+                   Err(_) => println!("The error is this!")
                }
                Err(_) => println!("The Respnse is not come from the server")
            }
@@ -36,10 +36,10 @@ fn hello() -> String {
 
     let mut file = match File::open(&path) {
         Ok(file) => file,
-        Err(e) => println!("The file open Error {}",e)
+        Err(why) => panic!("The file open Error {}",why.description())
     };
 
-    let buffer = String::new();
+    let mut buffer = String::new();
     file.read_to_string(&mut buffer).unwrap();
 
     let json = Json::from_str(&buffer).unwrap();
@@ -50,6 +50,6 @@ fn hello() -> String {
 }
 
 fn main() {
-    rocket::ignite().mount("/",routes![hello].launch());
+    rocket::ignite().mount("/",routes![hello]).launch();
 }
 
